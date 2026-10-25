@@ -25,6 +25,10 @@ The base layer has "timeless" home row mods on `A S D F` and `J K L ;`, configur
 
 Tapping a key types the letter as usual. Holding it while pressing a key on the *other* hand (or a thumb key) produces the modifier; keys on the same hand always resolve as taps unless the modifier is held past the tapping term. The `hml` and `hmr` behaviours are defined at the top of [config/adv360pro.keymap](config/adv360pro.keymap), where `tapping-term-ms`, `quick-tap-ms` and `require-prior-idle-ms` can be tuned; the troubleshooting section of urob's README explains which value to change for which symptom. Global defaults for ZMK's built-in `&mt` and `&lt` behaviours are set at the top of the keymap as well.
 
+### Thumb keys and navigation
+
+The left thumb Space key is a layer-tap (`&lt 1 SPACE`): tap it for Space, hold it for layer 1 (the keypad layer). On that layer `H J K L` are the arrow keys, vim style (left, down, up, right), and the right thumb Backspace sends Alt+Backspace to delete a word. On the base layer the right thumb key is a plain Backspace.
+
 ## Building the Firmware with GitHub Actions
 
 ### Setup
