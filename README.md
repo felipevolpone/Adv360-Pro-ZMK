@@ -2,12 +2,28 @@
 
 ## Modifying the keymap
 
-[The ZMK documentation](https://zmk.dev/docs) covers both basic and advanced functionality and has a table of OS compatibility for keycodes. Please note that the RGB Underglow, Backlight and Power Management sections are not relevant to the Advantage 360 Pro's custom ZMK fork. For more information see [this note](#note)
+[The ZMK documentation](https://zmk.dev/docs) covers both basic and advanced functionality and has a table of OS compatibility for keycodes. This repository builds against upstream ZMK, so all of the documentation applies, including the RGB Underglow and Backlight sections. For more information see [this note](#note).
+
+The keymap lives in [config/adv360pro.keymap](config/adv360pro.keymap) and is shared by both halves; Kconfig options go in [config/adv360pro.conf](config/adv360pro.conf).
 
 * If you would like to continue using GitHub we recommend using Nick Coutsos’s keymap editor: https://nickcoutsos.github.io/keymap-editor/.
-* If you would prefer to leave GitHub and firmware flashing behind you can perform a one-time firmware update to gain access to Clique. Get started here: https://kinesis-ergo.com/360p-clique-upgrade/.
+* If you would prefer to leave GitHub and firmware flashing behind you can perform a one-time firmware update to gain access to Clique. Get started here: https://kinesis-ergo.com/360p-clique-upgrade/. Clique is designed for the Kinesis firmware and is not supported with the upstream ZMK firmware built by this repository.
+* The left half firmware built by this repository has [ZMK Studio](https://zmk.dev/docs/features/studio) enabled, so the keymap can also be edited live from https://zmk.studio over USB. Unlock the keyboard first with Mod+Esc (`&studio_unlock` on the Mod layer).
 
 Certain ZMK features (e.g. combos) require knowing the exact key positions in the matrix. They can be found in both image and text format [here](assets/key-positions.md)
+
+### Home row mods
+
+The base layer has "timeless" home row mods on `A S D F` and `J K L ;`, configured as described in [urob's zmk-config](https://github.com/urob/zmk-config#timeless-homerow-mods):
+
+| Key | Hold | Key | Hold |
+| :---: | --- | :---: | --- |
+| A | GUI (Cmd / Win) | J | Ctrl |
+| S | Alt (Option) | K | Shift |
+| D | Shift | L | Alt (Option) |
+| F | Ctrl | ; | GUI (Cmd / Win) |
+
+Tapping a key types the letter as usual. Holding it while pressing a key on the *other* hand (or a thumb key) produces the modifier; keys on the same hand always resolve as taps unless the modifier is held past the tapping term. The `hml` and `hmr` behaviours are defined at the top of [config/adv360pro.keymap](config/adv360pro.keymap), where `tapping-term-ms`, `quick-tap-ms` and `require-prior-idle-ms` can be tuned; the troubleshooting section of urob's README explains which value to change for which symptom. Global defaults for ZMK's built-in `&mt` and `&lt` behaviours are set at the top of the keymap as well.
 
 ## Building the Firmware with GitHub Actions
 
@@ -19,7 +35,9 @@ Certain ZMK features (e.g. combos) require knowing the exact key positions in th
 ### Build firmware
 
 1. Push a commit to trigger the build.
-2. Download the artifact.
+2. Download the `firmware` artifact. It contains the `*-left.uf2` and `*-right.uf2` files; the left half is built with ZMK Studio enabled.
+
+A second `settings-reset` artifact contains firmware that wipes the stored settings (Bluetooth bonds etc.) of each half, see [Resetting settings](#resetting-settings).
 
 ## Building the Firmware in a local container
 
@@ -91,6 +109,10 @@ Follow the programming instruction on page 8 of the [Quick Start Guide](https://
 
 > Note: Some operating systems wont always treat the drive as ejected after the settings-reset file is flashed or may throw a spurious error, this doesn't mean that the flashing process has failed.
 
+### Resetting settings
+
+When moving from the Kinesis ZMK fork to the upstream ZMK firmware built by this repository (or between major ZMK/Zephyr versions) the two halves may fail to pair with each other or with previously paired computers. If that happens, flash the `settings-reset` firmware from the build artifacts to both halves (`*-settings-reset-left.uf2` on the left, `*-settings-reset-right.uf2` on the right), then flash the regular firmware again and re-pair your devices. See [ZMK's connection troubleshooting guide](https://zmk.dev/docs/troubleshooting/connection-issues) for details. The [settings-reset.uf2](/settings-reset.uf2) file in this repository was built from the Kinesis fork; prefer the freshly built one.
+
 ### Upgrading from V2 to V3
 
 If you encounter a git conflict when updating your repository to V3.0 please follow the instructions on how to resolve it [here](UPGRADE.md).
@@ -103,48 +125,29 @@ Starting on 11/15/2023 the Advantage 360 Pro will now automatically record the c
 
 ## N-Key Rollover
 
-By default this keyboard has NKRO enabled, however for compatibility reasons the higher ranges are not enabled. If you want to use F13-F24 or the INTL1-9 keys with NKRO enabled you can change `CONFIG_ZMK_HID_KEYBOARD_EXTENDED_REPORT=n` to `CONFIG_ZMK_HID_KEYBOARD_EXTENDED_REPORT=y` in [adv360_left_defconfig](/config/boards/arm/adv360/adv360_left_defconfig#L65)
+By default this keyboard has NKRO enabled, however for compatibility reasons the higher ranges are not enabled. If you want to use F13-F24 or the INTL1-9 keys with NKRO enabled add `CONFIG_ZMK_HID_KEYBOARD_NKRO_EXTENDED_REPORT=y` to [config/adv360pro.conf](/config/adv360pro.conf).
 
 ## Battery reporting
 
-By default reporting the battery level over BLE is disabled as this can cause some computers to spontaneously wake up repeatedly. If you'd like to enable this functionality change `CONFIG_BT_BAS=n` to  `CONFIG_BT_BAS=y` in [adv360_left_defconfig](/config/boards/arm/adv360/adv360_left_defconfig#L58).
+By default reporting the battery level over BLE is disabled as this can cause some computers to spontaneously wake up repeatedly. If you'd like to enable this functionality change `CONFIG_BT_BAS=n` to `CONFIG_BT_BAS=y` in [config/adv360pro.conf](/config/adv360pro.conf).
 
-## Modifier indicator color
+## Indicator LEDs
 
-The color of the CAPS/NUM/SCROLL LOCK indicator LEDs may be configured by specifying a hexadecimal RGB color code. For example, `CONFIG_ZMK_RGB_UNDERGLOW_MOD_COLOR=0xFF0000` would give red indicator colors. In order to set the indicator color on both modules, ensure that both [adv360_left_defconfig](/config/boards/arm/adv360/adv360_left_defconfig) and [adv360_right_defconfig](/config/boards/arm/adv360/adv360_right_defconfig) have been updated.
-
-## Layer colors
-
-A total of 32 layers are supported by ZMK, with the highest currently active layer displayed using the layer LEDs on each of the left and right modules. All possible colors are listed below; for the first 8 layers the same color is displayed on both modules. After that, only the right module color will cycle through until "rolling over", which will cause the left module color to change as well (and this then repeats). To avoid confusion, the black/off LED color is only used for layer 0.
-
-| Layer # | L/R | Layer # | L/R | Layer # | L/R | Layer # | L/R |
-| ---: | :---: | ---: | :---: | ---: | :---: | ---: | :---: |
-| 0 | <img valign='middle' src='assets/swatches/000000.svg'/> <img valign='middle' src='assets/swatches/000000.svg'/> | 8 | <img valign='middle' src='assets/swatches/FFFFFF.svg'/> <img valign='middle' src='assets/swatches/0000FF.svg'/> | 16 | <img valign='middle' src='assets/swatches/0000FF.svg'/> <img valign='middle' src='assets/swatches/FF0000.svg'/> | 24 | <img valign='middle' src='assets/swatches/00FF00.svg'/> <img valign='middle' src='assets/swatches/00FFFF.svg'/> |
-| 1 | <img valign='middle' src='assets/swatches/FFFFFF.svg'/> <img valign='middle' src='assets/swatches/FFFFFF.svg'/> | 9 | <img valign='middle' src='assets/swatches/FFFFFF.svg'/> <img valign='middle' src='assets/swatches/00FF00.svg'/> | 17 | <img valign='middle' src='assets/swatches/0000FF.svg'/> <img valign='middle' src='assets/swatches/FF00FF.svg'/> | 25 | <img valign='middle' src='assets/swatches/00FF00.svg'/> <img valign='middle' src='assets/swatches/FFFF00.svg'/> |
-| 2 | <img valign='middle' src='assets/swatches/0000FF.svg'/> <img valign='middle' src='assets/swatches/0000FF.svg'/> | 10 | <img valign='middle' src='assets/swatches/FFFFFF.svg'/> <img valign='middle' src='assets/swatches/FF0000.svg'/> | 18 | <img valign='middle' src='assets/swatches/0000FF.svg'/> <img valign='middle' src='assets/swatches/00FFFF.svg'/> | 26 | <img valign='middle' src='assets/swatches/FF0000.svg'/> <img valign='middle' src='assets/swatches/FFFFFF.svg'/> |
-| 3 | <img valign='middle' src='assets/swatches/00FF00.svg'/> <img valign='middle' src='assets/swatches/00FF00.svg'/> | 11 | <img valign='middle' src='assets/swatches/FFFFFF.svg'/> <img valign='middle' src='assets/swatches/FF00FF.svg'/> | 19 | <img valign='middle' src='assets/swatches/0000FF.svg'/> <img valign='middle' src='assets/swatches/FFFF00.svg'/> | 27 | <img valign='middle' src='assets/swatches/FF0000.svg'/> <img valign='middle' src='assets/swatches/0000FF.svg'/> |
-| 4 | <img valign='middle' src='assets/swatches/FF0000.svg'/> <img valign='middle' src='assets/swatches/FF0000.svg'/> | 12 | <img valign='middle' src='assets/swatches/FFFFFF.svg'/> <img valign='middle' src='assets/swatches/00FFFF.svg'/> | 20 | <img valign='middle' src='assets/swatches/00FF00.svg'/> <img valign='middle' src='assets/swatches/FFFFFF.svg'/> | 28 | <img valign='middle' src='assets/swatches/FF0000.svg'/> <img valign='middle' src='assets/swatches/00FF00.svg'/> |
-| 5 | <img valign='middle' src='assets/swatches/FF00FF.svg'/> <img valign='middle' src='assets/swatches/FF00FF.svg'/> | 13 | <img valign='middle' src='assets/swatches/FFFFFF.svg'/> <img valign='middle' src='assets/swatches/FFFF00.svg'/> | 21 | <img valign='middle' src='assets/swatches/00FF00.svg'/> <img valign='middle' src='assets/swatches/0000FF.svg'/> | 29 | <img valign='middle' src='assets/swatches/FF0000.svg'/> <img valign='middle' src='assets/swatches/FF00FF.svg'/> |
-| 6 | <img valign='middle' src='assets/swatches/00FFFF.svg'/> <img valign='middle' src='assets/swatches/00FFFF.svg'/> | 14 | <img valign='middle' src='assets/swatches/0000FF.svg'/> <img valign='middle' src='assets/swatches/FFFFFF.svg'/> | 22 | <img valign='middle' src='assets/swatches/00FF00.svg'/> <img valign='middle' src='assets/swatches/FF0000.svg'/> | 30 | <img valign='middle' src='assets/swatches/FF0000.svg'/> <img valign='middle' src='assets/swatches/00FFFF.svg'/> |
-| 7 | <img valign='middle' src='assets/swatches/FFFF00.svg'/> <img valign='middle' src='assets/swatches/FFFF00.svg'/> | 15 | <img valign='middle' src='assets/swatches/0000FF.svg'/> <img valign='middle' src='assets/swatches/00FF00.svg'/> | 23 | <img valign='middle' src='assets/swatches/00FF00.svg'/> <img valign='middle' src='assets/swatches/FF00FF.svg'/> | 31 | <img valign='middle' src='assets/swatches/FF0000.svg'/> <img valign='middle' src='assets/swatches/FFFF00.svg'/> |
+With upstream ZMK the three LEDs on each half are driven by ZMK's standard [RGB underglow](https://zmk.dev/docs/features/underglow) feature. They are off by default and can be toggled with `&rgb_ug RGB_TOG` on the Mod layer; the effect, colour and brightness are set with the `CONFIG_ZMK_RGB_UNDERGLOW_*` options in [config/adv360pro.conf](/config/adv360pro.conf). The layer colours and the CAPS/NUM/SCROLL LOCK modifier indicators of the Kinesis ZMK fork are not available, see [this note](#note).
 
 ## Changelog
 
 The changelog for both the config repo and the underlying ZMK fork that the config repo builds against can be found [here](CHANGELOG.md).
 
-## Beta testing
+## Updating ZMK
 
-The Advantage 360 Pro is always getting updates and refinements. If you are willing to beta test you can follow [this guide from ZMK](https://zmk.dev/docs/features/beta-testing#testing-features) on how to change where your config repo points to. The `west.yml` file that is mentioned is located in config/. [This link](config/west.yml) can take you to the file. Typically you will only need to change the `revision: ` to match the beta branch. There is currently no beta branch available for testing.
+The ZMK version that gets built is pinned in [config/west.yml](config/west.yml) through the `revision:` of the `zmk` project. Change it to a newer commit, a release tag such as `v0.4.0`, or `main` to follow ZMK's development branch, then push to rebuild. See the ZMK blog post on [pinning ZMK](https://zmk.dev/blog/2025/06/20/pinned-zmk) for details, and [ZMK's beta testing guide](https://zmk.dev/docs/features/beta-testing#testing-features) for pointing the manifest at a feature branch.
 
-Feedback on beta branches should be submitted as a GitHub issue on the base ZMK repository as opposed to this config repository.
-
-In the event of a major update the beta branch may not be compatible with the current mainline version of the config repository. If this is the case it will be detailed here along with instructions on how to update.
+Feedback on upstream ZMK should be submitted as a GitHub issue on the [ZMK repository](https://github.com/zmkfirmware/zmk) as opposed to this config repository.
 
 ## Note
 
-By default this config repository references [a customised version of ZMK](https://github.com/ReFil/zmk/tree/adv360-z3.5) with Advantage 360 Pro specific functionality and changes over [base ZMK](https://github.com/zmkfirmware/zmk). The Kinesis fork is regularly updated to bring the latest updates and changes from base ZMK however will not always be completely up to date, some features such as new keycodes will not be immediately available on the 360 Pro after they are implemented in base ZMK.
-
-Whilst the Advantage 360 Pro is compatible with base ZMK (The pull request to merge it can be seen [here](https://github.com/zmkfirmware/zmk/pull/1454) if you want to see how to implement it) some of the more advanced features (the indicator RGB leds) will not work, and Kinesis cannot provide customer service for usage of base ZMK. Likewise the ZMK community cannot provide support for either the Kinesis keymap editor, nor any usage of the Kinesis custom fork.
+This config repository builds against [upstream ZMK](https://github.com/zmkfirmware/zmk) using its built-in `adv360pro_left//zmk` and `adv360pro_right//zmk` board definitions, pinned in [config/west.yml](config/west.yml). It originally referenced [Kinesis' customised version of ZMK](https://github.com/ReFil/zmk/tree/adv360-z3.5-2), which is based on Zephyr 3.5 and adds Advantage 360 Pro specific functionality (layer and modifier indicator LEDs, battery status display, Clique support) over base ZMK. Those features are not available with upstream ZMK, and Kinesis cannot provide customer service for usage of base ZMK. If you need them, point `west.yml` back at the Kinesis fork and restore the `config/boards` directory from this repository's git history.
 
 ## Other support
 

@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: zmkfirmware/zmk-build-arm:stable
-    name: Build (Legacy)
+    name: Build
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,6 +22,7 @@ jobs:
           bin/get_version.sh $branch_name $commit
       - name: Cache west modules
         uses: actions/cache@v4
+        continue-on-error: true
         env:
           cache-name: cache-zephyr-modules
         with:
@@ -39,15 +40,15 @@ jobs:
       - name: West Init
         run: west init -l config
       - name: West Update
-        run: west update
+        run: west update --fetch-opt=--filter=tree:0
       - name: West Zephyr export
         run: west zephyr-export
-      - name: West Build (left)
-        run: west build -s zmk/app -d build/left -b adv360_left -- -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
+      - name: West Build (left, with ZMK Studio)
+        run: west build -s zmk/app -d build/left -b adv360pro_left//zmk -S studio-rpc-usb-uart -- -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" -DCONFIG_ZMK_STUDIO=y
       - name: Adv360 Left Kconfig file
         run: grep -vE '(^#|^$)' build/left/zephyr/.config
       - name: West Build (right)
-        run: west build -s zmk/app -d build/right -b adv360_right -- -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
+        run: west build -s zmk/app -d build/right -b adv360pro_right//zmk -- -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
       - name: Adv360 Right Kconfig file
         run: grep -vE '(^#|^$)' build/right/zephyr/.config
       - name: Rename zmk.uf2
@@ -55,15 +56,16 @@ jobs:
       - name: Archive (Adv360)
         uses: actions/upload-artifact@v4
         with:
-          name: firmware-no-clique
+          name: firmware
           path: |
             ${{ steps.get_info.outputs.file_prefix }}-left.uf2
             ${{ steps.get_info.outputs.file_prefix }}-right.uf2
-  build-clique:
+
+  settings-reset:
     runs-on: ubuntu-latest
     container:
       image: zmkfirmware/zmk-build-arm:stable
-    name: Build (Clique)
+    name: Build (settings reset)
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -72,12 +74,10 @@ jobs:
         run: |
           timestamp=$(date +"%Y%m%d%H%M")
           commit=$(echo "${{ github.sha }}" | cut -c1-7)
-          file_prefix=$timestamp-$commit
-          branch_name=$(echo "${{ github.ref }}" | awk -F'/' '{print $3}' | cut -c1-4)
-          echo "file_prefix=$file_prefix" >> $GITHUB_OUTPUT
-          bin/get_version.sh $branch_name $commit clique
+          echo "file_prefix=$timestamp-$commit" >> $GITHUB_OUTPUT
       - name: Cache west modules
         uses: actions/cache@v4
+        continue-on-error: true
         env:
           cache-name: cache-zephyr-modules
         with:
@@ -95,23 +95,19 @@ jobs:
       - name: West Init
         run: west init -l config
       - name: West Update
-        run: west update
+        run: west update --fetch-opt=--filter=tree:0
       - name: West Zephyr export
         run: west zephyr-export
-      - name: West Build (left)
-        run: west build -s zmk/app -d build/left -b adv360_left -S studio-rpc-usb-uart -- -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" -DCONFIG_ZMK_STUDIO=y
-      - name: Adv360 Left Kconfig file
-        run: grep -vE '(^#|^$)' build/left/zephyr/.config
-      - name: West Build (right)
-        run: west build -s zmk/app -d build/right -b adv360_right -- -DZMK_CONFIG="${GITHUB_WORKSPACE}/config"
-      - name: Adv360 Right Kconfig file
-        run: grep -vE '(^#|^$)' build/right/zephyr/.config
+      - name: West Build (settings reset, left)
+        run: west build -s zmk/app -d build/reset-left -b adv360pro_left//zmk -- -DSHIELD=settings_reset
+      - name: West Build (settings reset, right)
+        run: west build -s zmk/app -d build/reset-right -b adv360pro_right//zmk -- -DSHIELD=settings_reset
       - name: Rename zmk.uf2
-        run: cp build/left/zephyr/zmk.uf2 ${{ steps.get_info.outputs.file_prefix }}-left.uf2 && cp build/right/zephyr/zmk.uf2 ${{ steps.get_info.outputs.file_prefix }}-right.uf2
-      - name: Archive (Adv360)
+        run: cp build/reset-left/zephyr/zmk.uf2 ${{ steps.get_info.outputs.file_prefix }}-settings-reset-left.uf2 && cp build/reset-right/zephyr/zmk.uf2 ${{ steps.get_info.outputs.file_prefix }}-settings-reset-right.uf2
+      - name: Archive (settings reset)
         uses: actions/upload-artifact@v4
         with:
-          name: firmware-clique
+          name: settings-reset
           path: |
-            ${{ steps.get_info.outputs.file_prefix }}-left.uf2
-            ${{ steps.get_info.outputs.file_prefix }}-right.uf2
+            ${{ steps.get_info.outputs.file_prefix }}-settings-reset-left.uf2
+            ${{ steps.get_info.outputs.file_prefix }}-settings-reset-right.uf2

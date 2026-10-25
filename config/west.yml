@@ -1,13 +1,18 @@
+# West manifest for the ZMK workspace used to build the firmware.
+#
+#   west init -l config && west update && west zephyr-export
+#
+# The `revision` of the `zmk` project pins the ZMK version that is built. Set
+# it to a newer commit, a release tag (e.g. v0.4.0) or `main` to update ZMK,
+# see https://zmk.dev/blog/2025/06/20/pinned-zmk
 manifest:
   remotes:
     - name: zmkfirmware
       url-base: https://github.com/zmkfirmware
-    - name: refil
-      url-base: https://github.com/refil
   projects:
     - name: zmk
-      remote: refil
-      revision: adv360-z3.5-2
+      remote: zmkfirmware
+      revision: 4dd95d7840eb3d5a3f59bb29fbf1ab054715ef85 # main (2026-10-09), Zephyr 4.1
       import: app/west.yml
   self:
     path: config
