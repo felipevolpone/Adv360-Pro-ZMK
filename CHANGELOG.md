@@ -4,6 +4,8 @@ Here's all notable changes and commits to both the configuration repo and the ba
 Many thanks to all those who have submitted issues and pull requests to make this firmware better!
 ## Config repo
 
+10/25/2026 - Inner column keys on the base layer: Caps Word (left row 1), Cmd+Space (left row 2), Cmd+Shift+Alt+S (left row 3) and Right GUI (right row 3); the keypad layer toggle moves to the Fn layer
+
 10/25/2026 - Add J+K and K+L combos on the base layer that send Cmd+Shift+[ and Cmd+Shift+] (previous / next tab on macOS)
 
 10/25/2026 - Swap the thumb Space and Backspace keys, make Space a layer-tap into layer 1, map H J K L to the arrow keys and the right thumb Backspace to Alt+Backspace on layer 1

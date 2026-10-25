@@ -40,6 +40,19 @@ Two combos on the right home row, active on the base layer only:
 
 Both keys have to go down within 18 ms of each other, and no other key may have been pressed in the previous 150 ms, so rolling `jk` or `kl` while typing does not trigger them. They are defined in the `combos` node of [config/adv360pro.keymap](config/adv360pro.keymap).
 
+### Inner column keys
+
+The keys next to the thumb clusters on the base layer:
+
+| Key | Sends |
+| --- | --- |
+| Left, row 1 (next to `5`) | Caps Word (`&caps_word`): the next word is typed in capitals |
+| Left, row 2 (next to `T`) | Cmd+Space |
+| Left, row 3 (next to `G`) | Cmd+Shift+Alt+S (Shortcat) |
+| Right, row 3 (next to `H`) | Right GUI (Cmd / Win) |
+
+The keypad layer toggle that used to sit on the row 1 key is still available on the Fn layer (Fn + that key), and the same key toggles the keypad layer off again while it is active.
+
 ## Building the Firmware with GitHub Actions
 
 ### Setup
