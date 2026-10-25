@@ -4,6 +4,8 @@ Here's all notable changes and commits to both the configuration repo and the ba
 Many thanks to all those who have submitted issues and pull requests to make this firmware better!
 ## Config repo
 
+10/25/2026 - Add J+K and K+L combos on the base layer that send Cmd+Shift+[ and Cmd+Shift+] (previous / next tab on macOS)
+
 10/25/2026 - Swap the thumb Space and Backspace keys, make Space a layer-tap into layer 1, map H J K L to the arrow keys and the right thumb Backspace to Alt+Backspace on layer 1
 
 10/25/2026 - Build against upstream ZMK (Zephyr 4.1, `adv360pro_left//zmk` and `adv360pro_right//zmk` boards) instead of the Kinesis fork; move the custom Kconfig into `config/adv360pro.conf`; add timeless home row mods (GUI/Alt/Shift/Ctrl on A S D F, Ctrl/Shift/Alt/GUI on J K L ;) following urob's zmk-config; build `settings_reset` firmware for both halves in CI

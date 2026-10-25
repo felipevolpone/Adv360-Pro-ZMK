@@ -82,6 +82,33 @@
       };
     };
 
+  /*
+   * Combos, following the TOTEM config: short timeout so they only fire when
+   * both keys go down together, and require-prior-idle-ms so rolling "jk" or
+   * "kl" while typing does not trigger them. Key positions: J=41 K=42 L=43.
+   */
+  combos {
+    compatible = "zmk,combos";
+
+    // J + K -> Cmd+Shift+[ (previous tab on macOS)
+    combo_prev_tab {
+      timeout-ms = <18>;
+      require-prior-idle-ms = <150>;
+      key-positions = <41 42>;
+      bindings = <&kp LG(LS(LBKT))>;
+      layers = <0>;
+    };
+
+    // K + L -> Cmd+Shift+] (next tab on macOS)
+    combo_next_tab {
+      timeout-ms = <18>;
+      require-prior-idle-ms = <150>;
+      key-positions = <42 43>;
+      bindings = <&kp LG(LS(RBKT))>;
+      layers = <0>;
+    };
+  };
+
   keymap {
     compatible = "zmk,keymap";
 

@@ -29,6 +29,17 @@ Tapping a key types the letter as usual. Holding it while pressing a key on the 
 
 The left thumb Space key is a layer-tap (`&lt 1 SPACE`): tap it for Space, hold it for layer 1 (the keypad layer). On that layer `H J K L` are the arrow keys, vim style (left, down, up, right), and the right thumb Backspace sends Alt+Backspace to delete a word. On the base layer the right thumb key is a plain Backspace.
 
+### Combos
+
+Two combos on the right home row, active on the base layer only:
+
+| Keys | Sends | macOS default |
+| :---: | --- | --- |
+| J + K | Cmd+Shift+[ | Previous tab |
+| K + L | Cmd+Shift+] | Next tab |
+
+Both keys have to go down within 18 ms of each other, and no other key may have been pressed in the previous 150 ms, so rolling `jk` or `kl` while typing does not trigger them. They are defined in the `combos` node of [config/adv360pro.keymap](config/adv360pro.keymap).
+
 ## Building the Firmware with GitHub Actions
 
 ### Setup
