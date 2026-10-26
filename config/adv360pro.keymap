@@ -39,6 +39,15 @@
   hold-trigger-key-positions = <0>;
 };
 
+/*
+ * Sticky keys (&sk), also from the TOTEM config: a tapped sticky Shift applies
+ * to the next key only, and is dropped if no key follows within 900 ms.
+ */
+&sk {
+  release-after-ms = <900>;
+  quick-release;
+};
+
 / {
     behaviors {
       #include "macros.dtsi"
@@ -117,19 +126,19 @@
       bindings = <
         &kp EQUAL &kp N1      &kp N2      &kp N3       &kp N4       &kp N5 &caps_word                                                             &mo 3 &kp N6 &kp N7       &kp N8       &kp N9      &kp N0         &kp MINUS
         &kp TAB   &kp Q       &kp W       &kp E        &kp R        &kp T  &kp LG(SPACE)                                                              &none &kp Y  &kp U        &kp I        &kp O       &kp P          &kp BSLH
-        &kp ESC   &hml LGUI A &hml LALT S &hml LSHFT D &hml LCTRL F &kp G  &kp LG(LA(LS(S)))           &kp LCTRL &kp LALT &kp LGUI  &kp RCTRL             &kp RGUI &kp H  &hmr LCTRL J &hmr RSHFT K &hmr LALT L &hmr LGUI SEMI &kp SQT
-        &kp LSHFT &kp Z       &kp X       &kp C        &kp V        &kp B                            &kp HOME &kp PG_UP                             &kp N  &kp M        &kp COMMA    &kp DOT     &kp FSLH       &kp RSHFT
+        &kp ESC   &hml LGUI A &hml LALT S &hml LSHFT D &hml LCTRL F &kp G  &kp LG(LA(LS(S)))           &kp LG(LS(C)) &kp LALT &kp LGUI  &kp RCTRL             &kp RGUI &kp H  &hmr LCTRL J &hmr RSHFT K &hmr LALT L &hmr LGUI SEMI &kp SQT
+        &sk LSHFT &kp Z       &kp X       &kp C        &kp V        &kp B                            &kp HOME &kp PG_UP                             &kp N  &kp M        &kp COMMA    &kp DOT     &kp FSLH       &sk RSHFT
         &mo 2     &kp GRAVE   &kp CAPS    &kp LEFT     &kp RIGHT                  &lt 1 SPACE &kp DEL &kp END &kp PG_DN &kp ENTER &lt 2 BSPC               &kp UP       &kp DOWN     &kp LBKT    &kp RBKT       &mo 2
       >;
     };
     keypad {
       display-name = "Kp";
       bindings = <
-        &kp EQUAL &kp N1      &kp N2      &kp N3       &kp N4       &kp N5 &tog 1                                                             &mo 3 &kp N6 &kp KP_NUM &kp KP_EQUAL &kp KP_DIVIDE &kp KP_MULTIPLY &kp MINUS
-        &kp TAB   &kp Q       &kp W       &kp E        &kp R        &kp T  &none                                                              &none &kp Y  &kp KP_N7  &kp KP_N8    &kp KP_N9     &kp KP_MINUS    &kp BSLH
-        &kp ESC   &hml LGUI A &hml LALT S &hml LSHFT D &hml LCTRL F &kp G  &none           &kp LCTRL &kp LALT &kp LGUI  &kp RCTRL             &none &kp LEFT &kp DOWN &kp UP &kp RIGHT &kp KP_PLUS     &kp SQT
-        &kp LSHFT &kp Z       &kp X       &kp C        &kp V        &kp B                            &kp HOME &kp PG_UP                             &kp N  &kp KP_N1  &kp KP_N2    &kp KP_N3     &kp KP_ENTER    &kp RSHFT
-        &mo 2     &kp GRAVE   &kp CAPS    &kp LEFT     &kp RIGHT                  &trans   &kp DEL   &kp END  &kp PG_DN &kp ENTER &kp LA(BSPC)             &kp UP     &kp DOWN     &kp KP_DOT    &kp RBKT        &mo 2
+        &trans    &trans      &trans      &trans       &trans       &trans &trans                                                             &trans &trans  &trans      &trans       &trans         &trans          &trans
+        &trans    &none         &kp MINUS &kp LEFT_BRACE       &kp RIGHT_BRACE       &none           &none                                                              &none &kp SQT   &kp LS(SQT)    &none        &none         &none           &none
+        &trans    &none         &kp PLUS  &kp LEFT_PARENTHESIS &kp RIGHT_PARENTHESIS &none           &none           &kp LCTRL &kp LALT &kp LGUI  &kp RCTRL             &none &kp LEFT  &kp DOWN_ARROW &kp UP_ARROW &kp RIGHT     &none           &none
+        &trans    &none         &kp UNDER &kp LEFT_BRACKET     &kp RIGHT_BRACKET     &none                            &kp HOME &kp PG_UP                             &kp COLON &kp EQUAL      &none        &none         &none           &none
+        &mo 2     &none       &none       &none        &none                      &trans   &kp DEL   &kp END  &kp PG_DN &kp ENTER &kp LA(BSPC)             &none      &none        &none         &none           &mo 2
       >;
     };
     fn {
