@@ -157,7 +157,7 @@ By default this keyboard has NKRO enabled, however for compatibility reasons the
 
 ## Battery reporting
 
-By default reporting the battery level over BLE is disabled as this can cause some computers to spontaneously wake up repeatedly. If you'd like to enable this functionality change `CONFIG_BT_BAS=n` to `CONFIG_BT_BAS=y` in [config/adv360pro.conf](/config/adv360pro.conf).
+The battery level is reported over BLE and shows up next to the keyboard in the host's Bluetooth settings (on macOS: System Settings > Bluetooth, or the Bluetooth menu bar icon). The right half's level is reported as a second Battery Service, which most operating systems do not display. The battery notifications can cause some computers to spontaneously wake up from sleep; if that happens change `CONFIG_BT_BAS=y` to `CONFIG_BT_BAS=n` in [config/adv360pro.conf](/config/adv360pro.conf).
 
 ## Indicator LEDs
 
